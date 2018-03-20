@@ -1,4 +1,12 @@
-import {createSandbox, triggerEvent, TestPlugin, clickMouse, moveMouse, releaseMouse, waitForDragDelay} from 'helper';
+import {
+  createSandbox,
+  triggerEvent,
+  TestPlugin,
+  clickMouse,
+  moveMouse,
+  releaseMouse,
+  waitForDragDelay,
+} from 'helper';
 import Draggable, {defaultOptions} from '../Draggable';
 import {DragStartEvent, DragMoveEvent, DragStopEvent} from '../DragEvent';
 import {DraggableInitializedEvent, DraggableDestroyEvent} from '../DraggableEvent';
@@ -34,8 +42,10 @@ describe('Draggable', () => {
   describe('.Plugins', () => {
     it('should be available statically', () => {
       expect(Draggable.Plugins).toBeDefined();
-      expect(Draggable.Plugins.Mirror).toEqual(Mirror);
+      expect(Draggable.Plugins.Announcement).toEqual(Announcement);
+      expect(Draggable.Plugins.ClassManager).toEqual(ClassManager);      
       expect(Draggable.Plugins.Focusable).toEqual(Focusable);
+      expect(Draggable.Plugins.Mirror).toEqual(Mirror);
       expect(Draggable.Plugins.Scrollable).toEqual(Scrollable);
     });
   });
@@ -89,11 +99,13 @@ describe('Draggable', () => {
 
       expect(newInstance.plugins[0]).toBeInstanceOf(Announcement);
 
-      expect(newInstance.plugins[1]).toBeInstanceOf(Focusable);
+      expect(newInstance.plugins[1]).toBeInstanceOf(ClassManager);
 
-      expect(newInstance.plugins[2]).toBeInstanceOf(Mirror);
+      expect(newInstance.plugins[2]).toBeInstanceOf(Focusable);
 
-      expect(newInstance.plugins[3]).toBeInstanceOf(Scrollable);
+      expect(newInstance.plugins[3]).toBeInstanceOf(Mirror);
+
+      expect(newInstance.plugins[4]).toBeInstanceOf(Scrollable);
     });
 
     it('should attach custom plugins', () => {
@@ -101,9 +113,9 @@ describe('Draggable', () => {
         plugins: [TestPlugin],
       });
 
-      expect(newInstance.plugins).toHaveLength(5);
+      expect(newInstance.plugins.length).toBe(6);
 
-      const customPlugin = newInstance.plugins[4];
+      const customPlugin = newInstance.plugins[5];
 
       expect(customPlugin.draggable).toBe(newInstance);
 
@@ -166,10 +178,6 @@ describe('Draggable', () => {
 
       newInstance.destroy();
 
-      expect(expectedPlugins[4].detachFunction).toHaveBeenCalled();
-
-      expect(expectedPlugins[4].detachFunction).toHaveBeenCalledTimes(1);
-
       expect(expectedPlugins[5].detachFunction).toHaveBeenCalled();
 
       expect(expectedPlugins[5].detachFunction).toHaveBeenCalledTimes(1);
@@ -177,6 +185,10 @@ describe('Draggable', () => {
       expect(expectedPlugins[6].detachFunction).toHaveBeenCalled();
 
       expect(expectedPlugins[6].detachFunction).toHaveBeenCalledTimes(1);
+
+      expect(expectedPlugins[7].detachFunction).toHaveBeenCalled();
+
+      expect(expectedPlugins[7].detachFunction).toHaveBeenCalledTimes(1);
     });
 
     it('should remove all sensor event listeners', () => {
@@ -536,125 +548,137 @@ describe('Draggable', () => {
     expect(call).toBeInstanceOf(DragStopEvent);
   });
 
-  it('adds `source:dragging` classname to draggable element on mousedown', () => {
-    const newInstance = new Draggable(containers, {
-      draggable: 'li',
-    });
-    const draggableElement = sandbox.querySelector('li');
-    document.elementFromPoint = () => draggableElement;
+  // test('adds `source:dragging` classname to draggable element on mousedown', () => {
+  //   const newInstance = new Draggable(containers, {
+  //     draggable: 'li',
+  //   });
+  //   const draggableElement = sandbox.querySelector('li');
+  //   document.elementFromPoint = () => draggableElement;
 
-    triggerEvent(draggableElement, 'mousedown', {button: 0});
+  //   triggerEvent(draggableElement, 'mousedown', {button: 0});
 
-    // Wait for delay
-    jest.runTimersToTime(100);
+  //   // Wait for delay
+  //   jest.runTimersToTime(100);
 
-    expect(newInstance.source.classList).toContain('draggable-source--is-dragging');
+  //   expect(newInstance.source.classList)
+  //     .toContain('draggable-source--is-dragging');
 
-    triggerEvent(draggableElement, 'mouseup');
-  });
+  //   triggerEvent(draggableElement, 'mouseup');
+  // });
 
-  it('removes `source:dragging` classname from draggable element on mouseup', () => {
-    const newInstance = new Draggable(containers, {
-      draggable: 'li',
-    });
-    const draggableElement = sandbox.querySelector('li');
-    document.elementFromPoint = () => draggableElement;
+  // test('removes `source:dragging` classname from draggable element on mouseup', () => {
+  //   const newInstance = new Draggable(containers, {
+  //     draggable: 'li',
+  //   });
+  //   const draggableElement = sandbox.querySelector('li');
+  //   document.elementFromPoint = () => draggableElement;
 
-    triggerEvent(draggableElement, 'mousedown', {button: 0});
+  //   triggerEvent(draggableElement, 'mousedown', {button: 0});
 
-    // Wait for delay
-    jest.runTimersToTime(100);
+  //   // Wait for delay
+  //   jest.runTimersToTime(100);
 
-    const source = newInstance.source;
+  //   const source = newInstance.source;
 
-    expect(source.classList).toContain('draggable-source--is-dragging');
+  //   expect(source.classList)
+  //     .toContain('draggable-source--is-dragging');
 
-    triggerEvent(draggableElement, 'mouseup', {button: 0});
+  //   triggerEvent(draggableElement, 'mouseup', {button: 0});
 
-    expect(source.classList).not.toContain('draggable-source--is-dragging');
-  });
+  //   expect(source.classList)
+  //     .not
+  //     .toContain('draggable-source--is-dragging');
+  // });
 
-  it('removes `source:dragging` classname from draggable element on dragEvent.cancel()', () => {
-    const newInstance = new Draggable(containers, {
-      draggable: 'li',
-    });
-    const draggableElement = sandbox.querySelector('li');
-    document.elementFromPoint = () => draggableElement;
+  // test('removes `source:dragging` classname from draggable element on dragEvent.cancel()', () => {
+  //   const newInstance = new Draggable(containers, {
+  //     draggable: 'li',
+  //   });
+  //   const draggableElement = sandbox.querySelector('li');
+  //   document.elementFromPoint = () => draggableElement;
 
-    newInstance.on('drag:start', (event) => {
-      expect(newInstance.source.classList).toContain('draggable-source--is-dragging');
+  //   newInstance.on('drag:start', (event) => {
+  //     expect(newInstance.source.classList)
+  //       .toContain('draggable-source--is-dragging');
 
-      event.cancel();
-    });
+  //     event.cancel();
+  //   });
 
-    triggerEvent(draggableElement, 'mousedown', {button: 0});
+  //   triggerEvent(draggableElement, 'mousedown', {button: 0});
 
-    // Wait for delay
-    jest.runTimersToTime(100);
+  //   // Wait for delay
+  //   jest.runTimersToTime(100);
 
-    const source = newInstance.source;
+  //   const source = newInstance.source;
 
-    expect(source.classList).not.toContain('draggable-source--is-dragging');
-  });
+  //   expect(source.classList)
+  //     .not
+  //     .toContain('draggable-source--is-dragging');
+  // });
 
-  it('adds `body:dragging` classname to body on mousedown', () => {
-    (() =>
-      new Draggable(containers, {
-        draggable: 'li',
-      }))();
-    const draggableElement = sandbox.querySelector('li');
-    document.elementFromPoint = () => draggableElement;
+  // test('adds `body:dragging` classname to body on mousedown', () => {
+  //   (() => new Draggable(containers, {
+  //     draggable: 'li',
+  //   }))();
+  //   const draggableElement = sandbox.querySelector('li');
+  //   document.elementFromPoint = () => draggableElement;
 
-    triggerEvent(draggableElement, 'mousedown', {button: 0});
+  //   triggerEvent(draggableElement, 'mousedown', {button: 0});
 
-    // Wait for delay
-    jest.runTimersToTime(100);
+  //   // Wait for delay
+  //   jest.runTimersToTime(100);
 
-    expect(document.body.classList).toContain('draggable--is-dragging');
+  //   expect(document.body.classList)
+  //     .toContain('draggable--is-dragging');
 
-    triggerEvent(draggableElement, 'mouseup');
-  });
+  //   triggerEvent(draggableElement, 'mouseup');
+  // });
 
-  it('removes `body:dragging` classname from body on mouseup', () => {
-    (() =>
-      new Draggable(containers, {
-        draggable: 'li',
-      }))();
-    const draggableElement = sandbox.querySelector('li');
-    document.elementFromPoint = () => draggableElement;
+  // test('removes `body:dragging` classname from body on mouseup', () => {
+  //   (() => new Draggable(containers, {
+  //     draggable: 'li',
+  //   }))();
+  //   const draggableElement = sandbox.querySelector('li');
+  //   document.elementFromPoint = () => draggableElement;
 
-    triggerEvent(draggableElement, 'mousedown', {button: 0});
+  //   triggerEvent(draggableElement, 'mousedown', {button: 0});
 
-    // Wait for delay
-    jest.runTimersToTime(100);
+  //   // Wait for delay
+  //   jest.runTimersToTime(100);
 
-    expect(document.body.classList).toContain('draggable--is-dragging');
+  //   expect(document.body.classList)
+  //     .toContain('draggable--is-dragging');
 
-    triggerEvent(document.body, 'mouseup', {button: 0});
+  //   triggerEvent(document.body, 'mouseup', {button: 0});
 
-    expect(document.body.classList).not.toContain('draggable--is-dragging');
-  });
+  //   expect(document.body.classList)
+  //     .not
+  //     .toContain('draggable--is-dragging');
+  // });
 
-  it('removes `body:dragging` classname from body on dragEvent.cancel()', () => {
-    const newInstance = new Draggable(containers, {
-      draggable: 'li',
-    });
-    const draggableElement = sandbox.querySelector('li');
-    document.elementFromPoint = () => draggableElement;
+  // test('removes `body:dragging` classname from body on dragEvent.cancel()', () => {
+  //   const newInstance = new Draggable(containers, {
+  //     draggable: 'li',
+  //   });
+  //   const draggableElement = sandbox.querySelector('li');
+  //   document.elementFromPoint = () => draggableElement;
 
-    newInstance.on('drag:start', (event) => {
-      expect(document.body.classList).toContain('draggable--is-dragging');
+  //   newInstance.on('drag:start', (event) => {
+  //     expect(document.body.classList)
+  //       .toContain('draggable--is-dragging');
 
-      event.cancel();
-    });
+  //     event.cancel();
+  //   });
 
-    triggerEvent(draggableElement, 'mousedown', {button: 0});
+  //   triggerEvent(draggableElement, 'mousedown', {button: 0});
 
-    // Wait for delay
-    jest.runTimersToTime(100);
+  //   // Wait for delay
+  //   jest.runTimersToTime(100);
 
-    expect(document.body.classList).not.toContain('draggable--is-dragging');
-  });
+  //   expect(document.body.classList)
+  //     .not
+  //     .toContain('draggable--is-dragging');
+  // });
 
   it('adds `container:placed` classname to draggable container element on mouseup', () => {
     (() =>
@@ -735,25 +759,29 @@ describe('Draggable', () => {
     expect(containers[0].classList).not.toContain('draggable-container--is-dragging');
   });
 
-  it('removes `container:dragging` classname from draggable container element on dragEvent.cancel()', () => {
-    const newInstance = new Draggable(containers, {
-      draggable: 'li',
-    });
-    const draggableElement = sandbox.querySelector('li');
+  // Change behaviour
+  // test('removes `container:dragging` classname from draggable container element on dragEvent.cancel()', () => {
+  //   const newInstance = new Draggable(containers, {
+  //     draggable: 'li',
+  //   });
+  //   const draggableElement = sandbox.querySelector('li');
 
-    newInstance.on('drag:start', (event) => {
-      expect(containers[0].classList).toContain('draggable-container--is-dragging');
+  //   newInstance.on('drag:start', (event) => {
+  //     expect(containers[0].classList)
+  //       .toContain('draggable-container--is-dragging');
 
-      event.cancel();
-    });
+  //     event.cancel();
+  //   });
 
-    triggerEvent(draggableElement, 'mousedown', {button: 0});
+  //   triggerEvent(draggableElement, 'mousedown', {button: 0});
 
-    // Wait for delay
-    jest.runTimersToTime(100);
+  //   // Wait for delay
+  //   jest.runTimersToTime(100);
 
-    expect(containers[0].classList).not.toContain('draggable-container--is-dragging');
-  });
+  //   expect(containers[0].classList)
+  //     .not
+  //     .toContain('draggable-container--is-dragging');
+  // });
 
   it('adds and removes `source:original` on start and stop', () => {
     const newInstance = new Draggable(containers, {
