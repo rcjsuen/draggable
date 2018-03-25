@@ -24,7 +24,7 @@ export default function UniqueDropzone() {
     droppableOrigin = evt.originalSource.parentNode.dataset.droppable;
   });
 
-  droppable.on('droppable:over', (evt) => {
+  droppable.on('droppable:dropped', (evt) => {
     if (droppableOrigin !== evt.droppable.dataset.droppable) {
       evt.cancel();
     }
