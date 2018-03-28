@@ -6,7 +6,7 @@
 
 ### Changed
 
-## v1.0.0-beta.5 - 2018-03-02
+## [v1.0.0-beta.5] - 2018-03-02
 
 ### Added
 
@@ -43,7 +43,7 @@
 - Fixes npm install issue
 - Fixes `overContainer` property for `DragOutContainerEvent`
 
-## v1.0.0-beta.4 - 2018-01-15
+## [v1.0.0-beta.4] - 2018-01-15
 
 ### Added
 
@@ -69,7 +69,7 @@
 - Changed `AbstractEvent#_canceled` to use symbols for private instance variables
 - Some fixes for the documentation READMEs
 
-## v1.0.0-beta.3 - 2017-11-01
+## [v1.0.0-beta.3] - 2017-11-01
 
 ### Added
 
@@ -104,7 +104,7 @@
   - `MouseSensor` now prevents native elements to start dragging during delay
   - All sensors now listen to document rather than each container
 
-## v1.0.0-beta.2 - 2017-10-10
+## [v1.0.0-beta.2] - 2017-10-10
 
 ### Added
 
@@ -130,3 +130,8 @@
 ## v1.0.0-beta - 2017-09-27
 
 Initial release
+
+[v1.0.0-beta.5]: (https://github.com/Shopify/draggable/compare/v1.0.0-beta.4...v1.0.0-beta.5)
+[v1.0.0-beta.4]: (https://github.com/Shopify/draggable/compare/v1.0.0-beta.3...v1.0.0-beta.4)
+[v1.0.0-beta.3]: (https://github.com/Shopify/draggable/compare/v1.0.0-beta.2...v1.0.0-beta.3)
+[v1.0.0-beta.2]: (https://github.com/Shopify/draggable/compare/v1.0.0-beta...v1.0.0-beta.2)
